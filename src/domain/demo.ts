@@ -1,8 +1,7 @@
 /**
  * @module domain/demo
- * @remarks Données strictement fictives du prototype. Aucun stockage utilisateur.
+ * @remarks Jeu de démonstration totalement fictif, sans synchronisation Google Drive.
  */
-
 export interface DemoTopic {
   readonly id: string;
   readonly title: string;
@@ -10,23 +9,34 @@ export interface DemoTopic {
   readonly status: "PENDING" | "IN_DISCUSSION" | "RESOLVED";
 }
 
+export interface DemoBox {
+  readonly boxId: string;
+  readonly displayName: string;
+  readonly participantCount: number;
+  readonly storage: "demo-only";
+}
+
 export interface DemoDashboard {
   readonly mode: "demo";
+  readonly box: DemoBox;
   readonly topics: readonly DemoTopic[];
 }
 
 /**
- * Fournit une photographie reproductible de la démonstration.
+ * Retourne un espace multi-personnes fictif, sans identifiants Google réels.
  *
- * @returns Trois sujets fictifs sans aucune donnée personnelle.
- * @example
- * const dashboard = getDemoDashboard();
- * // dashboard.mode === "demo"
+ * @returns Dashboard intégralement fictif.
  * @public
  */
 export function getDemoDashboard(): DemoDashboard {
   return {
     mode: "demo",
+    box: {
+      boxId: "demo-box",
+      displayName: "Notre Box de démonstration",
+      participantCount: 3,
+      storage: "demo-only",
+    },
     topics: [
       { id: "demo-1", title: "Mieux organiser nos week-ends", category: "Organisation", status: "PENDING" },
       { id: "demo-2", title: "Prévoir du temps ensemble", category: "Vie commune", status: "IN_DISCUSSION" },

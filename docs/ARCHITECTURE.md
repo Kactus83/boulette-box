@@ -2,8 +2,12 @@
 
 ## Intention
 
-Application de communication guidée destinée d'abord à deux personnes,
-éventuellement distribuée publiquement ultérieurement.
+Application de communication guidée, initialement destinée à un couple mais
+conçue pour un nombre variable de participants et éventuellement diffusée
+publiquement. Une Box correspond à un dossier Google Drive partagé.
+
+**Référence à jour :** [ADR-0002-DRIVE-FIRST.md](ADR-0002-DRIVE-FIRST.md).
+Ce fichier décrit la partie prototype historique, pas une intégration Drive déjà achevée.
 
 ## Frontières
 
@@ -19,7 +23,8 @@ Application de communication guidée destinée d'abord à deux personnes,
 - Entrées global + thread sous réserve des capacités de l'hôte ChatGPT.
 - Interface intégrée en HTML autonome compilé par Vite.
 - Quatre boutons qui utilisent le message MCP Apps pour demander un workflow à ChatGPT.
-- Trois sujets fictifs : aucune persistance, authentification ou API IA externe.
+- Une Box multi-personnes fictive et trois sujets fictifs : aucune persistance,
+  authentification ou API IA externe.
 
 ## Contraintes de sécurité
 

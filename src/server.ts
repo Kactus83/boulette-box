@@ -48,10 +48,16 @@ export function createBouletteBoxServer(): McpServer {
     "open_dashboard",
     {
       title: "Ouvrir Boulette Box",
-      description: "Affiche le tableau de bord de démonstration Boulette Box avec trois sujets fictifs.",
+      description: "Affiche une Box multi-personnes et trois sujets fictifs. N'accède pas à Google Drive et n'enregistre aucune donnée.",
       inputSchema: z.object({}),
       outputSchema: z.object({
         mode: z.literal("demo"),
+        box: z.object({
+          boxId: z.string(),
+          displayName: z.string(),
+          participantCount: z.number(),
+          storage: z.literal("demo-only"),
+        }),
         topics: z.array(z.object({
           id: z.string(),
           title: z.string(),

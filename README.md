@@ -1,6 +1,6 @@
 # Boulette Box
 
-Un espace pour déposer ses pensées, mieux se comprendre et préparer des échanges à deux.
+Un espace partagé pour déposer ses pensées, mieux se comprendre et préparer des échanges à plusieurs.
 
 > **Prototype technique 0.1.0 : uniquement des sujets fictifs.** Rien n'est enregistré ni publié.
 
@@ -11,7 +11,12 @@ Un espace pour déposer ses pensées, mieux se comprendre et préparer des écha
 - Actions ouvrant une conversation guidée via le bridge MCP Apps.
 - Aucune API d'inférence IA ni connexion Google Drive à ce stade.
 
-Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et [docs/CI.md](docs/CI.md).
+Lire d'abord le [centre de documentation](docs/README.md), puis le
+[registre des décisions](docs/DECISIONS.md) et l'[ADR Drive-first](docs/ADR-0002-DRIVE-FIRST.md).
+
+La cible : **une Box = un dossier Google Drive partagé**, plusieurs participants possibles, chaque personne utilisant son propre ChatGPT et son connecteur Google Drive. Ce modèle produit est validé ; l'interopérabilité effective entre les plugins et l'alimentation autonome du dashboard sont encore à tester.
+
+Voir aussi [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et [docs/CI.md](docs/CI.md).
 
 ## Prérequis
 
@@ -24,7 +29,7 @@ Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et [docs/CI.md](docs/CI.md).
     git clone https://github.com/Kactus83/boulette-box.git
     cd boulette-box
     git fetch origin
-    git switch dev/flo/mcp-bootstrap
+    git switch develop
     npm ci
     npm run typecheck
     npm test
@@ -59,8 +64,9 @@ Après changement dans l'interface, relancer npm run build (un mode watch UI vie
 - Le package-lock.json provient de la première exécution GitHub Actions réussie.
 - Typecheck, tests, build et démarrage HTTP validés sur GitHub Actions (Node.js 24).
 - La connexion MCP à ChatGPT et le rendu réel du dashboard restent à valider.
-- La connexion automatique aux comptes ChatGPT personnels, le partage, la persistance,
-  l'authentification et les écritures restent à construire.
+- Les comptes ChatGPT personnels et leur connecteur Drive sont la cible fonctionnelle ;
+  notre MCP ne récupère **pas** automatiquement les autorisations du connecteur Google.
+- Le modèle Drive-first, le partage, la persistance et les écritures restent à valider et construire.
 - Pas de données privées ni de tokens dans le dépôt Git.
 - Ne pas exposer ce prototype sans authentification avec de vraies données.
 
