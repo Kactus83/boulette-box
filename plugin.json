@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "boulette-box",
+  "version": "0.1.0",
+  "description": "Guided conversations and shared topics for thoughtful communication. Prototype; no real personal data."
+}
