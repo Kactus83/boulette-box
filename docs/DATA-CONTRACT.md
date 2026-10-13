@@ -20,7 +20,8 @@
 | boxId | 82a66762-e210-49f0-9751-ce428301702d | UUID stable, fictif |
 | driveFolderId | demo-folder-id-only | doit correspondre au dossier accessible |
 | displayName | Box de démonstration | modifiable |
-| createdAt | 2026-10-13T00:00:00Z | horodatage ISO UTC |
+
+Le contrat TypeScript de démonstration valide uniquement les cinq champs ci-dessus. Un futur horodatage de création nécessitera une évolution versionnée du schéma, pas une colonne silencieusement ajoutée.
 
 Si l'ID folder ne correspond pas au dossier demandé, **refuser**
 l'association automatique et demander une nouvelle vérification.
