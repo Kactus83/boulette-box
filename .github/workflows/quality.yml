@@ -1,0 +1,128 @@
+name: Boulette Box · Quality (on demand)
+
+# Runs only on the repository default branch (master).
+# No push, pull_request or scheduled triggers: development is CI-silent.
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Repository branch to validate without running a workflow on that branch"
+        required: true
+        type: string
+        default: "develop"
+  # Limited owner-only dispatch method used by the connected GitHub app.
+  # The first line of an issue entitled [ci] validate specifies the target branch.
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: boulette-box-quality-main
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Typecheck · Tests · Build · Smoke
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'issues' &&
+       github.event.issue.user.login == 'Kactus83' &&
+       github.event.issue.title == '[ci] validate')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Resolve and validate source branch
+        id: source
+        shell: bash
+        env:
+          TARGET_INPUT: ${{ inputs.target_ref }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_EVENT_NAME" == "issues" ]]; then
+            target="${ISSUE_BODY%%$'\n'*}"
+          else
+            target="$TARGET_INPUT"
+          fi
+
+          case "$target" in
+            master|develop|dev/*|feature/*|fix/*) ;;
+            *)
+              echo "::error::Unsupported ref. Provide a named project branch, not an arbitrary ref."
+              exit 1
+              ;;
+          esac
+
+          git check-ref-format --branch "$target" > /dev/null
+          echo "ref=$target" >> "$GITHUB_OUTPUT"
+          echo "Validating $target through the workflow on master."
+
+      - name: Checkout selected source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.ref }}
+          persist-credentials: false
+
+      - name: Install Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Bootstrap phase: no committed package-lock.json yet.
+      # Replace with npm ci once the first generated lockfile is reviewed and committed.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: TypeScript strict typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production UI build
+        run: npm run build
+
+      - name: HTTP startup smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm start > server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          health=""
+          for attempt in $(seq 1 40); do
+            if health="$(curl --fail --silent http://127.0.0.1:8787/health)"; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [[ -z "$health" ]]; then
+            cat server.log
+            echo "::error::Server did not become healthy."
+            exit 1
+          fi
+
+          HEALTH_JSON="$health" node -e '
+            const response = JSON.parse(process.env.HEALTH_JSON);
+            if (response.status !== "ok" || response.app !== "boulette-box" || response.mode !== "demo") {
+              process.exitCode = 1;
+              console.error("Unexpected health response:", response);
+            } else {
+              console.log("HTTP health check passed.");
+            }
+          '
+
+      - name: Preserve generated dependency lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boulette-box-dependency-lock
+          path: package-lock.json
+          if-no-files-found: ignore
+          retention-days: 2
