@@ -66,7 +66,7 @@ export function createBouletteBoxServer(): McpServer {
     },
     async () => ({
       content: [{ type: "text", text: "Boulette Box : tableau de bord expérimental, sujets fictifs uniquement." }],
-      structuredContent: getDemoDashboard(),
+      structuredContent: { ...getDemoDashboard() },
     }),
   );
   return server;

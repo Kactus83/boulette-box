@@ -12,6 +12,6 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    rollupOptions: { input: resolve("public/dashboard.html") },
+    rollupOptions: { input: resolve("dashboard.html") },
   },
 });
