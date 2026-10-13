@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Boulette Box</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: var(--app-color-text-primary, CanvasText); background: var(--app-color-background, Canvas); }
+      main { max-width: 860px; margin: 0 auto; padding: 24px; }
+      header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+      h1 { margin: 0; font-size: 24px; }
+      h2 { font-size: 17px; margin: 28px 0 12px; }
+      p { line-height: 1.5; }
+      .muted, small { color: var(--app-color-text-secondary, GrayText); }
+      .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+      .grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+      .card, .topic { border: 1px solid var(--app-color-border, #b1b1b155); border-radius: 14px; padding: 16px; }
+      .metric { font-size: 25px; font-weight: 700; display: block; }
+      button { border: 1px solid var(--app-color-border, #9996); border-radius: 12px; background: var(--app-color-background-secondary, #9991); color: inherit; padding: 15px; text-align: left; width: 100%; cursor: pointer; font: inherit; }
+      button:hover, button:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+      button strong, button span, .topic strong, .topic small { display: block; }
+      button span { font-size: 13px; margin-top: 5px; }
+      .topic + .topic { margin-top: 8px; }
+      .banner { font-size: 12px; border-radius: 9px; padding: 8px 12px; background: var(--app-color-background-secondary, #9992); }
+      @media (max-width: 520px) { main { padding: 16px; } .grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <div class="eyebrow muted">Un espace pour mieux se comprendre</div>
+          <h1>♡ Boulette Box</h1>
+        </div>
+        <span class="banner">Mode démo</span>
+      </header>
+      <p class="muted">Exprimez ce qui compte, prenez le temps de comprendre et préparez vos échanges à deux.</p>
+      <section class="metrics" aria-label="Résumé des sujets fictifs">
+        <div class="card"><span class="metric" id="total">—</span><small>Sujets</small></div>
+        <div class="card"><span class="metric" id="pending">—</span><small>À discuter</small></div>
+        <div class="card"><span class="metric" id="active">—</span><small>En cours</small></div>
+      </section>
+      <h2>Que souhaitez-vous faire ?</h2>
+      <section class="grid">
+        <button type="button" data-workflow="create"><strong>＋ Déposer un sujet</strong><span>Être guidé pour exprimer une pensée</span></button>
+        <button type="button" data-workflow="perspective"><strong>◉ Ajouter mon point de vue</strong><span>Enrichir un sujet existant</span></button>
+        <button type="button" data-workflow="review"><strong>◇ Préparer une discussion</strong><span>Explorer les différentes perspectives</span></button>
+        <button type="button" data-workflow="help"><strong>ⓘ Comprendre l'application</strong><span>Découvrir les fonctions et les règles</span></button>
+      </section>
+      <h2>Sujets fictifs</h2>
+      <section id="topics" aria-live="polite"><p class="muted">Chargement des sujets de démonstration…</p></section>
+      <p id="status" class="muted" role="status">Connexion à ChatGPT…</p>
+    </main>
+    <script type="module" src="/src/ui/dashboard.ts"></script>
+  </body>
+</html>
