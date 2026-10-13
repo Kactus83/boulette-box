@@ -72,10 +72,9 @@ jobs:
         with:
           node-version: "24"
 
-      # Bootstrap phase: no committed package-lock.json yet.
-      # Replace with npm ci once the first generated lockfile is reviewed and committed.
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      # Lockfile committed on the validated source branch.
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: TypeScript strict typecheck
         run: npm run typecheck
@@ -118,64 +117,3 @@ jobs:
             }
           '
 
-      - name: Preserve generated dependency lockfile
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: boulette-box-dependency-lock
-          path: package-lock.json
-          if-no-files-found: ignore
-          retention-days: 2
-
-  bootstrap_lockfile:
-    name: Import verified lockfile (one-time)
-    if: >-
-      github.event_name == 'issues' &&
-      github.event.issue.user.login == 'Kactus83' &&
-      github.event.issue.title == '[ci] lock'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - name: Checkout bootstrap branch
-        uses: actions/checkout@v4
-        with:
-          ref: dev/flo/mcp-bootstrap
-          persist-credentials: true
-
-      - name: Retrieve lockfile from successful quality run
-        uses: actions/download-artifact@v4
-        with:
-          name: boulette-box-dependency-lock
-          run-id: 38377804740
-          repository: Kactus83/boulette-box
-          github-token: ${{ github.token }}
-
-      - name: Validate and commit dependency lock
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s package-lock.json
-          node - <<'NODE'
-          const fs = require("node:fs");
-          const p = JSON.parse(fs.readFileSync("package.json", "utf8"));
-          const l = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
-          const root = l.packages[""];
-          if (l.lockfileVersion !== 3 ||
-              JSON.stringify(p.dependencies) !== JSON.stringify(root.dependencies) ||
-              JSON.stringify(p.devDependencies) !== JSON.stringify(root.devDependencies)) {
-            console.error("Lockfile does not match the current manifest.");
-            process.exit(1);
-          }
-          NODE
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if git diff --cached --quiet; then
-            echo "Lockfile already committed."
-          else
-            git commit -m "chore: lock verified npm dependencies"
-            git push origin HEAD:refs/heads/dev/flo/mcp-bootstrap
-          fi
