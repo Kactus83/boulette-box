@@ -8,6 +8,13 @@ import {
   applyHostStyleVariables,
 } from "@modelcontextprotocol/ext-apps";
 
+interface DemoBox {
+  boxId: string;
+  displayName: string;
+  participantCount: number;
+  storage: "demo-only";
+}
+
 interface Topic {
   id: string;
   title: string;
@@ -16,10 +23,12 @@ interface Topic {
 }
 
 const workflows: Record<string, string> = {
+  setup: "Nous testons l'accueil Boulette Box. Explique-moi comment nous pourrions créer un dossier Google Drive partagé et un Sheet de démonstration pour une Box multi-personnes. Ne crée aucun fichier à ce stade : commence par présenter les étapes et demander mon accord.",
+  join: "Nous testons l'accueil Boulette Box. Explique comment rejoindre un dossier Google Drive déjà partagé en utilisant son identifiant et la vérification d'un manifeste Boulette Box. Ne consulte ni ne modifie de vrai Drive dans ce test.",
   create: "Avec Boulette Box, aide-moi à formuler un sujet personnel à mon rythme. Pose des questions bienveillantes, distingue faits, ressentis et besoins. Ceci est un prototype : ne publie ni n'enregistre aucune donnée.",
   perspective: "Avec Boulette Box, guide-moi pour apporter mon propre point de vue à un sujet existant. Commence par me demander de quel sujet il s'agit. Ne publie aucune donnée pendant ce test.",
-  review: "Avec Boulette Box, explique comment nous pourrons préparer une discussion à deux, comprendre nos besoins respectifs et rechercher des accords, sans arbitrer qui a raison.",
-  help: "Présente l'application Boulette Box : tableau de bord, création de sujet, contribution, discussion commune et validation explicite avant toute publication. Précise qu'il s'agit d'un prototype.",
+  review: "Avec Boulette Box, explique comment plusieurs personnes pourront préparer une discussion collective, comprendre leurs besoins respectifs et rechercher des accords, sans arbitrer qui a raison. Aucun fichier réel ne doit être modifié.",
+  help: "Présente Boulette Box : une Box correspond à un dossier Google Drive partagé, utilisable entre plusieurs personnes, avec des conversations personnelles puis des publications volontaires. Précise que la connexion Drive et le dashboard réels ne sont pas encore implémentés.",
 };
 
 const app = new App({ name: "Boulette Box", version: "0.1.0" });
@@ -27,6 +36,14 @@ const app = new App({ name: "Boulette Box", version: "0.1.0" });
 function setStatus(message: string): void {
   const node = document.getElementById("status");
   if (node) node.textContent = message;
+}
+
+function renderDemoBox(box: DemoBox): void {
+  const name = document.getElementById("box-label");
+  const participants = document.getElementById("participants-label");
+  if (name) name.textContent = box.displayName;
+  if (participants) participants.textContent =
+    String(box.participantCount) + " participants fictifs · Aucun Drive connecté";
 }
 
 function renderTopics(topics: readonly Topic[]): void {
@@ -55,6 +72,9 @@ function renderTopics(topics: readonly Topic[]): void {
 app.ontoolresult = (result) => {
   const data = result.structuredContent;
   if (data && typeof data === "object" && "topics" in data && Array.isArray(data.topics)) {
+    if ("box" in data && data.box && typeof data.box === "object") {
+      renderDemoBox(data.box as DemoBox);
+    }
     renderTopics(data.topics as Topic[]);
     setStatus("Démonstration — aucune donnée personnelle ni persistance.");
   }
