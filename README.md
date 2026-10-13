@@ -11,7 +11,7 @@ Un espace pour déposer ses pensées, mieux se comprendre et préparer des écha
 - Actions ouvrant une conversation guidée via le bridge MCP Apps.
 - Aucune API d'inférence IA ni connexion Google Drive à ce stade.
 
-Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) et [docs/CI.md](docs/CI.md).
 
 ## Prérequis
 
@@ -25,7 +25,7 @@ Voir [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
     cd boulette-box
     git fetch origin
     git switch dev/flo/mcp-bootstrap
-    npm install
+    npm ci
     npm run typecheck
     npm test
     npm run build
@@ -56,9 +56,9 @@ Après changement dans l'interface, relancer npm run build (un mode watch UI vie
 
 ## Limites connues
 
-- Absence de fichier package-lock.json jusqu'à la première installation npm validée.
-  Générer puis committer le lockfile et utiliser npm ci en CI.
-- La compilation et les tests sur un poste disposant des dépendances ne sont pas encore attestés.
+- Le package-lock.json provient de la première exécution GitHub Actions réussie.
+- Typecheck, tests, build et démarrage HTTP validés sur GitHub Actions (Node.js 24).
+- La connexion MCP à ChatGPT et le rendu réel du dashboard restent à valider.
 - La connexion automatique aux comptes ChatGPT personnels, le partage, la persistance,
   l'authentification et les écritures restent à construire.
 - Pas de données privées ni de tokens dans le dépôt Git.
